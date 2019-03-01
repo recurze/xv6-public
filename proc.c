@@ -542,3 +542,33 @@ int ps() {
     }
     return 0;
 }
+
+void strcpy(char * src, char * des) {
+    for (int i = 0; i < MSGSIZE; ++i) {
+        des[i] = src[i];
+    }
+}
+
+int enqueue(struct queue * q, char * msg) {
+    if (q->size == MAX_MESSAGES) return -1;
+    if (q->front == 0) q->front = 1;
+
+    ++(q->rear);
+    if (q->rear == MAX_MESSAGES) q->rear = 1;
+
+    strcpy(msg, q->buffer[q->rear]);
+    ++(q->size);
+    return 0;
+}
+
+int dequeue(struct queue * q, char * msg) {
+    if (!(q->size)) return -1;
+
+    strcpy(q->buffer[q->front], msg);
+
+    ++(q->front);
+    if (q->front == MAX_MESSAGES) q->front = 1;
+
+    --(q->size);
+    return 0;
+}
