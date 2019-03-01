@@ -1,3 +1,7 @@
+ifndef VERBOSE
+.SILENT:
+endif
+
 OBJS = \
 	bio.o\
 	console.o\
@@ -181,6 +185,10 @@ UPROGS=\
 	_usertests\
 	_wc\
 	_zombie\
+	_print_count\
+	_toggle\
+	_add\
+	_ps\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
@@ -253,6 +261,10 @@ EXTRA=\
 	printf.c umalloc.c\
 	README dot-bochsrc *.pl toc.* runoff runoff1 runoff.list\
 	.gdbinit.tmpl gdbutil\
+	print_count.c\
+	toggle.c\
+	add.c\
+	ps.c\
 
 dist:
 	rm -rf dist

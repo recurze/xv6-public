@@ -29,3 +29,8 @@ SYSCALL(getpid)
 SYSCALL(sbrk)
 SYSCALL(sleep)
 SYSCALL(uptime)
+
+SYSCALL(print_count)
+SYSCALL(toggle)
+SYSCALL(add)
+SYSCALL(ps)
