@@ -10,6 +10,8 @@ struct sleeplock;
 struct stat;
 struct superblock;
 
+struct queue;
+
 // bio.c
 void            binit(void);
 struct buf*     bread(uint, uint);
@@ -122,6 +124,9 @@ void            wakeup(void*);
 void            yield(void);
 
 int             ps(void);
+void            strcpy(char *, char *);
+int             enqueue(struct queue *, char *);
+int             dequeue(struct queue *, char *);
 
 // swtch.S
 void            swtch(struct context**, struct context*);

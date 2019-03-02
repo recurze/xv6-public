@@ -112,6 +112,8 @@ found:
   memset(p->context, 0, sizeof *p->context);
   p->context->eip = (uint)forkret;
 
+  p->msg_queue.front = -1;
+  p->msg_queue.rear = -1;
   return p;
 }
 
@@ -150,6 +152,7 @@ userinit(void)
 
   p->state = RUNNABLE;
 
+  cprintf("Uinit done\n");
   release(&ptable.lock);
 }
 
@@ -158,6 +161,7 @@ userinit(void)
 int
 growproc(int n)
 {
+    cprintf("Growing proc\n");
   uint sz;
   struct proc *curproc = myproc();
 
@@ -199,6 +203,14 @@ fork(void)
   np->sz = curproc->sz;
   np->parent = curproc;
   *np->tf = *curproc->tf;
+
+  np->msg_queue.front = curproc->msg_queue.front;
+  np->msg_queue.rear  = curproc->msg_queue.rear;
+  np->msg_queue.size  = curproc->msg_queue.size;
+
+  for (int i = 0; i < MAX_MESSAGES; ++i) {
+    strcpy(np->msg_queue.buffer[i], curproc->msg_queue.buffer[i]);
+  }
 
   // Clear %eax so that fork returns 0 in the child.
   np->tf->eax = 0;
@@ -542,6 +554,7 @@ int ps() {
     }
     return 0;
 }
+
 
 void strcpy(char * src, char * des) {
     for (int i = 0; i < MSGSIZE; ++i) {
