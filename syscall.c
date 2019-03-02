@@ -108,6 +108,8 @@ extern int sys_print_count(void);
 extern int sys_toggle(void);
 extern int sys_add(void);
 extern int sys_ps(void);
+extern int sys_send(void);
+extern int sys_recv(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]         sys_fork,

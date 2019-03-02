@@ -127,6 +127,8 @@ int             ps(void);
 void            strcpy(char *, char *);
 int             enqueue(struct queue *, char *);
 int             dequeue(struct queue *, char *);
+int             send_message(int, int, char *);
+int             recv_message(char *);
 
 // swtch.S
 void            swtch(struct context**, struct context*);

@@ -152,7 +152,6 @@ userinit(void)
 
   p->state = RUNNABLE;
 
-  cprintf("Uinit done\n");
   release(&ptable.lock);
 }
 
@@ -584,4 +583,33 @@ int dequeue(struct queue * q, char * msg) {
 
     --(q->size);
     return 0;
+}
+
+int send_message(int from, int to, char * msg) {
+    struct proc * p;
+    for (p = ptable.proc; p < ptable.proc + NPROC; ++p) {
+        if (p->pid == to) {
+            break;
+        }
+    }
+
+    acquire(&ptable.lock);
+    int ret = enqueue(&p->msg_queue, msg);
+    wakeup1(&p);
+    release(&ptable.lock);
+    return ret;
+}
+
+int recv_message(char * msg) {
+    struct proc * p = myproc();
+
+    acquire(&ptable.lock);
+    int ret = dequeue(&p->msg_queue, msg);
+    if (ret == -1) {
+        sleep(p, &ptable.lock);
+        ret = dequeue(&p->msg_queue, msg);
+    }
+
+    release(&ptable.lock);
+    return ret;
 }

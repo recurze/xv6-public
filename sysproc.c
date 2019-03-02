@@ -155,3 +155,23 @@ int sys_add() {
 int sys_ps() {
     return ps();
 }
+
+int sys_send() {
+    int from;
+    if (argint(0, &from) < 0) return -1;
+
+    int to;
+    if (argint(1, &to) < 0) return -1;
+
+    char * msg;
+    if (argstr(2, &msg) < 0) return -1;
+
+    return send_message(from, to, msg);
+}
+
+int sys_recv() {
+    char * msg;
+    if (argstr(0, &msg) < 0) return -1;
+
+    return recv_message(msg);
+}
