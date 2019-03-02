@@ -207,7 +207,7 @@ fork(void)
   np->msg_queue.size  = curproc->msg_queue.size;
 
   for (int i = 0; i < MAX_MESSAGES; ++i) {
-    strcpy(np->msg_queue.buffer[i], curproc->msg_queue.buffer[i]);
+    strcpy(curproc->msg_queue.buffer[i], np->msg_queue.buffer[i]);
   }
 
   // Clear %eax so that fork returns 0 in the child.
@@ -565,7 +565,7 @@ int enqueue(struct queue * q, char * msg) {
     if (q->front == -1) q->front = 0;
 
     ++(q->rear);
-    if (q->rear == MAX_MESSAGES) q->rear = 1;
+    if (q->rear == MAX_MESSAGES) q->rear = 0;
 
     strcpy(msg, q->buffer[q->rear]);
     ++(q->size);

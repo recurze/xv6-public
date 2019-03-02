@@ -1,0 +1,4 @@
+sys_fork 1
+sys_print_count 1
+sys_wait 1
+sys_write 18
