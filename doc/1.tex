@@ -1,0 +1,270 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsmath}
+\usepackage{centernot}
+\usepackage{lastpage}
+\usepackage{fancyhdr}
+\usepackage[most]{tcolorbox}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{listings}
+\usepackage{color}
+
+
+\geometry{
+    top=3cm,
+    bottom=3cm,
+    left=2.5cm,
+    right=2.5cm,
+}
+
+\pagestyle{myheadings}
+\pagestyle{fancy}
+\fancyhf{}
+
+\setlength{\headheight}{10pt}
+
+\renewcommand{\headrulewidth}{4pt}
+\renewcommand{\footrulewidth}{2pt}
+
+\fancyhead[L]{COL331: Assignment 1}
+\fancyhead[C]{}
+\fancyhead[R]{xv6}
+\fancyfoot[L]{}
+\fancyfoot[C]{}
+\fancyfoot[R]{\thepage/\pageref{LastPage}}
+
+\pagenumbering{roman}
+\author{\textbf{Rahul V}}
+\date{}
+\title{
+    \thispagestyle{empty}
+    \vspace{0.2\textheight}
+    \textbf{COL331: Lab 1} \\
+    \vspace{0.01\textheight}
+    \large \emph{Instructor: Smruti R. Sarangi} \\
+    \vspace{0.01\textheight}
+    \small Due\ on\ February 25, 2019.
+    \vspace{0.2\textheight}
+}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Java,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\newcommand{\genTitlePage} {
+    \maketitle
+    \begin{center}
+        \vspace{-0.05\textheight}
+        \large 2016CS10370
+    \end{center}
+}
+\newcommand{\BigO}[1]{\ensuremath{\mathcal{O}\left(#1  \right)}}
+
+\begin{document}
+
+\genTitlePage
+\clearpage
+\pagenumbering{arabic}
+
+\section{Adding $syscalls$ to xv6}
+\subsection {$Syscalls$ added}
+\begin{itemize}
+    \item \texttt{print\_count}: prints the number of times each \texttt{syscall}
+        was invoked since state changed to \texttt{TRACE\_ON}.
+    \item \texttt{toggle}: toggles the \texttt{trace\_state} and resets the
+        counter for each \texttt{syscall}.
+    \item \texttt{add}: adds two integer arguments and returns their sum.
+    \item \texttt{ps}: prints all current processes, i.e., all the processes
+        which are not in \texttt{UNUSED} state.
+    \item \texttt{send}: sends \texttt{msg} from process \texttt{sender\_pid} to
+        process \texttt{rec\_pid}.
+    \item \texttt{recv}: receives \texttt{msg} from mailbox. This is a blocking
+        call.
+    \item \texttt{send\_multi}: sends \texttt{msg} from process
+        \texttt{sender\_pid} to list of processes \texttt{rec\_pid[]}. An interrupt
+        is sent to each of the \texttt{rec\_pid[i]} to notify about new \texttt{msg}.
+\end{itemize}
+\subsection{How to add a $syscall$}
+Adding a $syscall$ requires changes made in multiple files, namely:
+\begin{itemize}
+    \item \texttt{defs.h}: add a forward declaration for functions to be defined
+        in \texttt{proc.c}
+    \item \texttt{user.h}: declare the function that can be called through shell,
+        i.e., name of the $syscall$.
+    \item \texttt{usys.S}: Function call is then linked to the respective
+        $syscall$ using the macro in this file.
+    \item \texttt{syscall.h}: define the position of the syscall vector, syscall
+        number.
+    \item \texttt{syscall.c}: \texttt{extern} declare the function to be
+        defined in \texttt{sysproc.c} and add function to syscall vector.
+    \item \texttt{sysproc.c}: add the real implementation of the $syscall$.
+    \item \texttt{user\_prog.c}: Handler function for the new $syscall$.
+\end{itemize}
+
+\newpage
+\subsection{Example}
+\begin{lstlisting}
+// File: user.h
+int add(int, int);
+
+// File: usys.S
+SYSCALL(add) // SYSCALL is the macro defined in the same file and mentioned above
+
+
+// File: syscall.h
+#define SYS_add 1 // ascending order is you will
+
+// File: syscall.c
+extern int sys_add(void); // arguments are taken from stack.
+static int (*syscalls[])(void) = {
+[SYS_add]    sys_add,
+. . .
+. . .
+. . .
+. . .
+};
+
+// File: sysproc.c
+// argint is defined in syscall.c, reads int from tf->esp
+int sys_add(void) {
+    int a;
+    if (argint(0, &a) < 0) return -1;
+
+    int b;
+    if (argint(1, &b) < 0) return -1;
+
+    return a + b;
+}
+
+// File: add.c
+// change atoi to convert negative numbers to int too.
+int main(int argc, char **argv) {
+    if (argc != 3) {
+        printf(2, ``usage: add a b\n''); //error
+    } else {
+        printf(1, ``%d\n'', add(atoi(argv[1]), atoi(argv[2]));
+    }
+    exit();
+}
+\end{lstlisting}
+
+\subsection{Additional details}
+\begin{itemize}
+    \item A lock is necessary on \texttt{syscalls\_count[]}. This is initialized
+        in \texttt{proc.c} and called from \texttt{main.c}.
+    \item $syscalls$ like \texttt{ps} and \texttt{send} recquire access to ptable
+        and so are defined in \texttt{proc.c} and declared in \texttt{defs.h}
+    \item Without \texttt{$\$syscall$.c}, you will not be able to invoke $syscall$ from
+        shell.
+    \item \texttt{atoi} in \texttt{ulib.c} is changed to handle negative numbers.
+\end{itemize}
+
+\section{Inter-process Communication}
+We use the $syscall$s \texttt{send} and \texttt{recv} for communication between
+the processes. Each process has a personal $message\_queue$; functions like a
+mailbox.
+
+\subsection{Unicast}
+\begin{itemize}
+    \item \texttt{send}:
+        \begin{enumerate}
+            \item \texttt{acquire}s the lock on \texttt{ptable} as it's a $write$.
+            \item $enqueues$ the \texttt{msg} in the \texttt{rec\_pid}'s queue.
+            \item On successful $enqueue$, wakes up the process \texttt{rec\_pid}
+            \item \texttt{release}s the acquired lock.
+        \end{enumerate}
+    \item \texttt{recv}:
+        \begin{enumerate}
+            \item This is a blocking call.
+            \item \texttt{acquire}s the lock on \texttt{ptable}.
+            \item Tries to $dequeue$ from it's message queue.
+            \item If unsuccessful (empty message queue), it puts itself to sleep
+                until there's a new message.
+            \item On waking up, it again $dequeue$s and returns with the message.
+            \item \texttt{release}s the lock on \texttt{ptable}.
+        \end{enumerate}
+\end{itemize}
+
+
+%\subsection{Multicast}
+%We use the $syscall$s \texttt{send\_multi} and \texttt{recv} for communication
+%between the processes.
+%\begin{itemize}
+%    \item \texttt{send\_multi} $enqueues$ to the $message\_queue$'s.
+%    \item \texttt{send\_multi} also sends a signal to these \texttt{rec\_pid}
+%    \item \texttt{Preparing signal system:}
+%        \begin{enumerate}
+%            \item define \texttt{struct signal\_stack} and include one in
+%                \texttt{struct proc}
+%            \item define \texttt{signal\_handler} and include one in
+%                \texttt{struct proc}
+%        \end{enumerate}
+%\end{itemize}
+
+\newpage
+\section{Distributed Algorithm:}
+\subsection {$Sum$ using UNICAST}
+\begin{itemize}
+    \item The $array$ is divided into \texttt{N\_CHILD\_PROCESSES} equal
+        contiguous segments.
+    \item Each child process computes $partial\_sum$ on it's assigned segment.
+    \item Child then sends the result to it's parent using $syscall$ \texttt{send}
+    \item Parent collects all the $msg$s from it's child processes
+        using $syscall$ \texttt{recv}.
+    \item Parent, then, consolidates these $partial\_sum$s into $total\_sum$
+\end{itemize}
+\begin{lstlisting}
+
+// File: assig1_8.c
+// N_PROCESSES == 1 is handled seperately;
+int get_sum(short* a, int size) {
+    int parent_id = getpid();
+    int length_of_segment = size/(N_PROCESSES - 1);
+
+    for (int i = 0; i < N_PROCESSES - 1; ++i) {
+        if (!fork()) {
+            int start = i * length_of_segment;
+            int end = start + length_of_segment;
+            if (i == N_PROCESSES - 2) end = size;
+
+            int sum = accumulate_range(a, start, end);
+            send(getpid(), parent, itoa(sum));
+            exit();
+        }
+    }
+
+    int ret = consolidated_sum();
+    return ret;
+}
+
+int consolidated_sum() {
+    int ret = 0;
+    char *sum = (char *) malloc(MSGSIZE);
+    for (int i = 0; i < N_PROCESSES - 1; ++i) {
+        recv(sum);
+        ret += atoi(sum);
+    }
+    return ret;
+}
+\end{lstlisting}
+%\subsection {$Variance$ using MULTICAST}
+\end{document}
