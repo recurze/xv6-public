@@ -120,6 +120,8 @@ static char * syscalls_names[] = {
 [SYS_toggle]       "sys_toggle",
 [SYS_add]          "sys_add",
 [SYS_ps]           "sys_ps",
+[SYS_ps]           "sys_send",
+[SYS_ps]           "sys_recv",
 };
 
 int syscalls_count[N_SYSCALLS + 1];
