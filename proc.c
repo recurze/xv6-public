@@ -160,7 +160,6 @@ userinit(void)
 int
 growproc(int n)
 {
-    cprintf("Growing proc\n");
   uint sz;
   struct proc *curproc = myproc();
 
@@ -563,7 +562,7 @@ void strcpy(char * src, char * des) {
 
 int enqueue(struct queue * q, char * msg) {
     if (q->size == MAX_MESSAGES) return -1;
-    if (q->front == 0) q->front = 1;
+    if (q->front == -1) q->front = 0;
 
     ++(q->rear);
     if (q->rear == MAX_MESSAGES) q->rear = 1;
@@ -579,7 +578,7 @@ int dequeue(struct queue * q, char * msg) {
     strcpy(q->buffer[q->front], msg);
 
     ++(q->front);
-    if (q->front == MAX_MESSAGES) q->front = 1;
+    if (q->front == MAX_MESSAGES) q->front = 0;
 
     --(q->size);
     return 0;
@@ -595,7 +594,7 @@ int send_message(int from, int to, char * msg) {
 
     acquire(&ptable.lock);
     int ret = enqueue(&p->msg_queue, msg);
-    wakeup1(&p);
+    wakeup1(p);
     release(&ptable.lock);
     return ret;
 }

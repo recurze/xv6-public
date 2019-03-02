@@ -138,6 +138,8 @@ static int (*syscalls[])(void) = {
 [SYS_toggle]       sys_toggle,
 [SYS_add]          sys_add,
 [SYS_ps]           sys_ps,
+[SYS_send]         sys_send,
+[SYS_recv]         sys_recv,
 };
 
 extern int trace_state;

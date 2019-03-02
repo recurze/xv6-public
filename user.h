@@ -29,7 +29,7 @@ void toggle(void);
 int add(int, int);
 void ps(void);
 void send(int, int, char *);
-void recv(char *);
+int recv(char *);
 
 // ulib.c
 int stat(const char*, struct stat*);
