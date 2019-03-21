@@ -194,7 +194,7 @@ UPROGS=\
 	_assig1_4\
 	_assig1_5\
 	_assig1_6\
-	_given\
+	_jacobi_seq\
 	_jacobi\
 
 fs.img: mkfs README arr $(UPROGS)
@@ -278,7 +278,7 @@ EXTRA=\
 	assig1_4.c\
 	assig1_5.c\
 	assig1_6.c\
-	given.c\
+	jacobi_seq.c\
 	jacobi.c\
 
 dist:
