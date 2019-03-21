@@ -1,5 +1,6 @@
 struct stat;
 struct rtcdate;
+struct Message;
 
 // system calls
 int fork(void);
@@ -28,8 +29,8 @@ void print_count(void);
 void toggle(void);
 int add(int, int);
 void ps(void);
-void send(int, int, char *);
-int recv(char *);
+void send(int, int, struct Message*);
+int recv(struct Message*);
 
 // ulib.c
 int stat(const char*, struct stat*);

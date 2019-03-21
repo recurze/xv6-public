@@ -11,6 +11,7 @@ struct stat;
 struct superblock;
 
 struct queue;
+struct Message;
 
 // bio.c
 void            binit(void);
@@ -125,10 +126,11 @@ void            yield(void);
 
 int             ps(void);
 void            strcpy(char *, char *);
-int             enqueue(struct queue *, char *);
-int             dequeue(struct queue *, char *);
-int             send_message(int, int, char *);
-int             recv_message(char *);
+void            msgcpy(struct Message *, struct Message *);
+int             enqueue(struct queue *, struct Message *);
+int             dequeue(struct queue *, struct Message *);
+int             send_message(int, int, struct Message *);
+int             recv_message(struct Message *);
 
 // swtch.S
 void            swtch(struct context**, struct context*);

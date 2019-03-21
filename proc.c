@@ -207,7 +207,7 @@ fork(void)
   np->msg_queue.size  = curproc->msg_queue.size;
 
   for (int i = 0; i < MAX_MESSAGES; ++i) {
-    strcpy(curproc->msg_queue.buffer[i], np->msg_queue.buffer[i]);
+    msgcpy(&curproc->msg_queue.buffer[i], &np->msg_queue.buffer[i]);
   }
 
   // Clear %eax so that fork returns 0 in the child.
@@ -560,22 +560,27 @@ void strcpy(char * src, char * des) {
     }
 }
 
-int enqueue(struct queue * q, char * msg) {
+void msgcpy(struct Message * src, struct Message * des) {
+    des->data = src->data;
+    des->sender = src->sender;
+}
+
+int enqueue(struct queue * q, struct Message * msg) {
     if (q->size == MAX_MESSAGES) return -1;
     if (q->front == -1) q->front = 0;
 
     ++(q->rear);
     if (q->rear == MAX_MESSAGES) q->rear = 0;
 
-    strcpy(msg, q->buffer[q->rear]);
+    msgcpy(msg, &q->buffer[q->rear]);
     ++(q->size);
     return 0;
 }
 
-int dequeue(struct queue * q, char * msg) {
+int dequeue(struct queue * q, struct Message * msg) {
     if (!(q->size)) return -1;
 
-    strcpy(q->buffer[q->front], msg);
+    msgcpy(&q->buffer[q->front], msg);
 
     ++(q->front);
     if (q->front == MAX_MESSAGES) q->front = 0;
@@ -584,7 +589,7 @@ int dequeue(struct queue * q, char * msg) {
     return 0;
 }
 
-int send_message(int from, int to, char * msg) {
+int send_message(int from, int to, struct Message * msg) {
     struct proc * p;
     for (p = ptable.proc; p < ptable.proc + NPROC; ++p) {
         if (p->pid == to) {
@@ -599,7 +604,7 @@ int send_message(int from, int to, char * msg) {
     return ret;
 }
 
-int recv_message(char * msg) {
+int recv_message(struct Message * msg) {
     struct proc * p = myproc();
 
     acquire(&ptable.lock);

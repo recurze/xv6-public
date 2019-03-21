@@ -1,4 +1,5 @@
 #include "types.h"
+
 // Per-CPU state
 struct cpu {
   uchar apicid;                // Local APIC ID
@@ -39,7 +40,7 @@ struct queue {
     int front;
     int rear;
     int size;
-    char buffer[MAX_MESSAGES][MSGSIZE];
+    struct Message buffer[MAX_MESSAGES];
 };
 
 // Per-process state

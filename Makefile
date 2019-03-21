@@ -194,8 +194,8 @@ UPROGS=\
 	_assig1_4\
 	_assig1_5\
 	_assig1_6\
-	_assig1_7\
-	_assig1_8\
+	_given\
+	_jacobi\
 
 fs.img: mkfs README arr $(UPROGS)
 	./mkfs fs.img README arr $(UPROGS)
@@ -278,8 +278,8 @@ EXTRA=\
 	assig1_4.c\
 	assig1_5.c\
 	assig1_6.c\
-	assig1_7.c\
-	assig1_8.c\
+	given.c\
+	jacobi.c\
 
 dist:
 	rm -rf dist

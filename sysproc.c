@@ -165,15 +165,15 @@ int sys_send() {
     int to;
     if (argint(1, &to) < 0) return -1;
 
-    char * msg;
-    if (argstr(2, &msg) < 0) return -1;
+    char* msg;
+    if (argptr(2, &msg, sizeof(struct Message)) < 0) return -1;
 
-    return send_message(from, to, msg);
+    return send_message(from, to, (struct Message*) msg);
 }
 
 int sys_recv() {
-    char * msg;
-    if (argstr(0, &msg) < 0) return -1;
+    char* msg;
+    if (argptr(0, &msg, sizeof(struct Message)) < 0) return -1;
 
-    return recv_message(msg);
+    return recv_message((struct Message*) msg);
 }
