@@ -6,7 +6,7 @@ typedef unsigned char  uchar;
 typedef uint pde_t;
 
 #define MSGSIZE          8
-#define MAX_MESSAGES     50
+#define MAX_MESSAGES     1000
 
 struct Message {
     float data;

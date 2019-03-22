@@ -4,7 +4,7 @@
 
 
 #define N 11
-#define E 0.00001
+#define E 0.0001
 #define T 100.0
 #define P 6
 #define L 20000
@@ -51,6 +51,7 @@ int main(int argc, char *argv[])
 		for (i =1; i< N-1; i++)	
 			for (j =1; j< N-1; j++) u[i][j] = w[i][j];
 	}
+        printf(1, "Iterations: %d\n", count);
 	for(i =0; i <N; i++){
 		for(j = 0; j<N; j++)
 			printf(1,"%d ",((int)u[i][j]));

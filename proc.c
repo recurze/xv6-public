@@ -599,7 +599,7 @@ int send_message(int from, int to, struct Message * msg) {
 
     acquire(&ptable.lock);
     int ret = enqueue(&p->msg_queue, msg);
-    wakeup1(p);
+    if (p->state == SLEEPING) wakeup1(p);
     release(&ptable.lock);
     return ret;
 }
