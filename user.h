@@ -30,7 +30,7 @@ void toggle(void);
 int add(int, int);
 void ps(void);
 void send(int, int, struct Message*);
-int recv(struct Message*);
+int recv(struct Message*, int);
 
 // ulib.c
 int stat(const char*, struct stat*);

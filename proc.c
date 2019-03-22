@@ -113,7 +113,11 @@ found:
   p->context->eip = (uint)forkret;
 
   p->msg_queue.front = -1;
+  p->msg_parent.front = -1;
   p->msg_queue.rear = -1;
+  p->msg_parent.rear = -1;
+  p->waiting_for_others = 0;
+  p->waiting_for_parent = 0;
   return p;
 }
 
@@ -597,21 +601,50 @@ int send_message(int from, int to, struct Message * msg) {
         }
     }
 
+    int ret;
     acquire(&ptable.lock);
-    int ret = enqueue(&p->msg_queue, msg);
-    if (p->state == SLEEPING) wakeup1(p);
+
+    int flag = 1;
+    if (p->parent->pid == from) {
+        ret = enqueue(&p->msg_parent, msg);
+        flag = p->waiting_for_parent;
+    } else {
+        ret = enqueue(&p->msg_queue, msg);
+        flag = p->waiting_for_others;
+    }
+
+    if (p->state == SLEEPING && flag) wakeup1(p);
     release(&ptable.lock);
     return ret;
 }
 
-int recv_message(struct Message * msg) {
+int recv_message(struct Message * msg, int parent) {
     struct proc * p = myproc();
 
+    int ret;
     acquire(&ptable.lock);
-    int ret = dequeue(&p->msg_queue, msg);
+
+    if (!parent) {
+        p->waiting_for_others = 1;
+        ret = dequeue(&p->msg_queue, msg);
+    } else {
+        p->waiting_for_parent = 1;
+        ret = dequeue(&p->msg_parent, msg);
+    }
+
     if (ret == -1) {
         sleep(p, &ptable.lock);
-        ret = dequeue(&p->msg_queue, msg);
+        if (!parent) {
+            ret = dequeue(&p->msg_queue, msg);
+        } else {
+            ret = dequeue(&p->msg_parent, msg);
+        }
+    }
+
+    if (!parent) {
+        p->waiting_for_others = 0;
+    } else {
+        p->waiting_for_parent = 0;
     }
 
     release(&ptable.lock);

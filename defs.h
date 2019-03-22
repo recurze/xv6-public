@@ -130,7 +130,7 @@ void            msgcpy(struct Message *, struct Message *);
 int             enqueue(struct queue *, struct Message *);
 int             dequeue(struct queue *, struct Message *);
 int             send_message(int, int, struct Message *);
-int             recv_message(struct Message *);
+int             recv_message(struct Message *, int);
 
 // swtch.S
 void            swtch(struct context**, struct context*);

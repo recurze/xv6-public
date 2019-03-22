@@ -175,5 +175,8 @@ int sys_recv() {
     char* msg;
     if (argptr(0, &msg, sizeof(struct Message)) < 0) return -1;
 
-    return recv_message((struct Message*) msg);
+    int parent;
+    if (argint(1, &parent) < 0) return -1;
+
+    return recv_message((struct Message*) msg, parent);
 }

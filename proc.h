@@ -60,6 +60,9 @@ struct proc {
   char name[16];               // Process name (debugging)
 
   struct queue msg_queue;
+  struct queue msg_parent;
+  int waiting_for_others;
+  int waiting_for_parent;
 };
 
 // Process memory is laid out contiguously, low addresses first:

@@ -3,7 +3,7 @@
 #include "user.h"
 
 
-#define N 11
+#define N 7
 #define E 0.0001
 #define T 100.0
 #define P 6
